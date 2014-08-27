@@ -3,6 +3,9 @@
 }
 
 <!DOCTYPE html>
+<script src="~/Scripts/jquery-1.8.2.js"></script>
+<script src="~/Scripts/jquery.signalR-2.1.1.js"></script>
+<script src="~/signalr/hubs"></script>
 <style type="text/css">
     .chat {
         border:solid 1px #0094ff;
@@ -19,6 +22,37 @@
     .foot {
     }
 </style>
+<script type="text/javascript">
+    var chat = $.connection.chat;
+    
+
+    chat.client.SendToAllMessage = function (name, msg) {
+        addMessage(msg);
+    }
+    chat.client.SendToGroupMessage = function (name, msg, group) {
+
+    }
+    $.connection.hub.logging = true;
+    
+    $.connection.hub.start().done(function () {
+        $('#send').click(function () {
+            chat.server.sendToAll("lihao",$('#msg').val());
+        })
+
+        $('#quite').click(function () {
+            //退出连接
+            chat.connection.state=4
+            //console.log(chat.connection.transport.send);
+            
+        });
+        
+
+    });
+    
+    function addMessage(message) {
+        $('#messages').append("<li>" + message  + "</li>")
+    }
+</script>
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
@@ -29,13 +63,14 @@
         <div class="title">聊天室:</div>
         <div class="title">在线人数:</div>
         <div class="content">
-            <ul>
-                <li></li>
+            <ul id="messages">
+               
             </ul>
         </div>
         
         <div class="foot">            
             <input type="button" id="send" value="发送" />
+            <input type="text" id="msg"  value="" />
             <input type="button" id="quite" value="退出聊天" />
         </div> 
     </div>
